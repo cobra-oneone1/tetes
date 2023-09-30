@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8" />
+	<title>サイトタイトル</title>
+</head>
+
+<style type="text/css">
+#trim {
+    width   : 120px;
+    margin  : 10px 0;
+    padding : 10px;
+}
+#in, #out {
+    vertical-align  : top;
+    width           : 500px;
+    height          : 500px;
+
+    font-size       : 13px;
+    line-height     : 15px;
+
+
+    background-image: repeating-linear-gradient(
+      #fff,
+      #fff calc(60px - 1px),
+      #ced4da calc(60px - 1px),
+      #ced4da 60px,
+      #fff 60px
+    );
+    background-origin: content-box;
+    background-clip  : content-box;
+    background-attachment: local;
+}
+</style>
+
+<script type="text/javascript">
+
+//後で二つに分けそうな気がするから二重にやる
+var trim = function (){
+    //trimはここで完了
+    var text    = document.querySelector('#in').value;
+    var textAry = text.split(/\n/);
+
+    for(var i=0,len=textAry.length; i<len; i++){
+        var tx     = textAry[i];
+        textAry[i] = tx.trim();
+    }
+
+    text = textAry.join('\n');
+
+    //4行
+    textAry = text.split(/\n/);
+    var gyouCnt = 0;
+
+    for(var i=0,len=textAry.length; i<len; i++){
+        var tx = textAry[i];
+        gyouCnt++;
+        
+        if(tx === ''){
+            if(gyouCnt < 4){
+                while(gyouCnt < 4){
+                    tx = '\n'+tx;
+                    gyouCnt ++;
+                }
+                textAry[i] = tx;
+            }
+            gyouCnt = 0;
+        }
+
+        if(gyouCnt == 5){
+            gyouCnt = 1;
+        }
+    }
+
+    text = textAry.join('\n');
+
+
+
+    document.querySelector('#out').value = text;
+};
+
+</script>
+
+<body>
+<div style="text-align: center;">
+    <div style="display: inline-block; text-align: left;">
+        <input type="button" id="trim" value="trim" onClick="trim()"></input>
+        <br>
+        <textarea id="in"></textarea>
+        <textarea id="out"></textarea>
+    </div>
+</div>
+
+</body>
+
+</html>
