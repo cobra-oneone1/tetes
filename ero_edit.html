@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8" />
+	<title>サイトタイトル</title>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+<script type="text/javascript">
+/*
+    <div class="item text">
+        <div class="type">テキスト</div>
+        <table>
+            <tr>
+                <td colspan="4"><input class="text" type="text" value=""></td>
+            </tr>
+        
+            <tr>
+                <td width="50px">x</td><td><input class="x" type="text" value="0"></td>
+                <td width="50px">y</td><td><input class="y" type="text" value="0"></td>
+            </tr>
+            <tr>
+                <td>原点</td>
+                <td>
+                    <select class="jouge">
+                        <option>上</option>
+                        <option>中</option>
+                        <option>下</option>
+                    </select>
+                </td>
+                <td></td>
+                <td>
+                    <select class="sayu">
+                        <option>左</option>
+                        <option>中</option>
+                        <option>右</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>サイズ</td><td><input class="size" type="text" value="16"></td><td></td><td></td>
+            </tr>
+        </table>
+        <input class="select" type="button" value="選択">
+        <input class="del" type="button" value="削除">
+    </div>
+*/
+/*
+var cli = function(){
+    navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+        if (result.state === "granted" || result.state  === "prompt"){
+            console.log(result.state);
+
+
+            var text = "hoge";
+            const type = "text/plain";//"application/rpgmz-EventCommand";
+            const blob = new Blob ([text], { type });
+            const data = [new ClipboardItem({ [type]: blob })];
+
+            navigator.clipboard.write(data).then(
+                () => {
+                    console.log("s");
+                },
+                () => {
+                    console.log("f");
+                },
+            );
+        }
+    });
+
+    navigator.permissions.query({ name: "clipboard-read" }).then((result) => {
+        if (result.state === "granted" || result.state  === "prompt"){
+            const text = navigator.clipboard.readText();
+            console.log(text);
+        }
+    });
+}
+
+
+var obj = {
+  "id": 49,
+
+  "list": [
+  {
+    "code": 355,
+    "indent": 0,
+    "parameters": ["CBR-エロステータス"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["テキスト-調教度数"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["x-1010"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["y-665"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["サイズ-30"]
+
+
+  }, {
+    "code": 355,
+    "indent": 0,
+    "parameters": ["CBR-エロステータス"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["画像-rion_tachie_face_bisho.png"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["x-110"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["y--30"]
+  }, {
+    "code": 655,
+    "indent": 0,
+    "parameters": ["サイズ-60"]
+  }, {
+    "code": 0,
+    "indent": 0,
+    "parameters": []
+  }
+  ],
+  "name": "ダミー",
+  "switchId": 1,
+  "trigger": 0
+}
+*/
+var cn = 0;
+
+
+var common = function () {
+
+    var sp = 
+    {
+        "id": 5,
+        "list": [],
+        "name": "ダミー",
+        "switchId": 1,
+        "trigger": 0
+    };
+
+    for(var i=0; i<dataList.length; i++){
+        sp.list.push(
+            {
+                "code": 355,
+                "indent": 0,
+                "parameters": ["CBR-エロステータス"]
+            }
+        );
+
+        var obj = dataList[i];
+        //######### テキスト
+        if(obj.text){
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["テキスト-"+obj.text]
+            });
+
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["x-"+obj.x]
+            });
+
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["y-"+obj.y]
+            });
+
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["サイズ-"+obj.size]
+            });
+        //######### 画像
+        }else{
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["画像-"+obj.name]
+            });
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["x-"+obj.x]
+            });
+
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["y-"+obj.y]
+            });
+
+            sp.list.push({
+                "code": 655,
+                "indent": 0,
+                "parameters": ["サイズ-"+obj.size]
+            });
+        }
+    }
+    sp.list.push({
+        "code": 0,
+        "indent": 0,
+        "parameters": []
+    });
+
+    $('#view').val(JSON.stringify(sp));
+
+}
+
+var data = {
+    text : '<div class="item text"><div class="type">テキスト</div><table><tr><td colspan="4"><input class="text" type="text" value=""></td></tr><tr><td width="50px">x</td><td><input class="x" type="text" value="0"></td><td width="50px">y</td><td><input class="y" type="text" value="0"></td></tr><tr><td>原点</td><td> <select class="jouge"> <option>上</option><option>中</option><option>下</option> </select> </td><td></td><td> <select class="sayu"> <option>左</option><option>中</option><option>右</option> </select> </td></tr><tr><td>サイズ</td><td><input class="size" type="text" value="16"></td><td></td><td></td></tr></table> <input class="select" type="button" value="選択"> <input class="del" type="button" value="削除"> </div>',
+    img  : '<div class="item img"><div class="type">画像</div><table><tr><td colspan="4"><input class="file" type="file"></td></tr><tr><td>x</td><td><input class="x" type="text" value="0"></td><td>y</td><td><input class="y" type="text" value="0"></td></tr><tr><td>原点</td><td> <select class="jouge"> <option>上</option><option>中</option><option>下</option> </select> </td><td></td><td> <select class="sayu"> <option>左</option><option>中</option><option>右</option> </select> </td></tr><tr><td>サイズ</td><td><input class="size" type="text" value="100"></td><td>透明度</td><td><input class="trans" type="text" value="100"></td></tr></table> <input class="select" type="button" value="選択"> <input class="del" type="button" value="削除"> </div>'
+};
+
+var dataList = [];
+
+$(function(){
+
+    //エロステのサイズ
+    $('#size_x').focusout(function(){
+        var size = Number($(this).val());
+
+        if(10 < size){
+            var canvas = document.querySelector("#ctx");
+            var ctx = canvas.getContext('2d');
+
+            ctx.canvas.width = size;
+        }
+    });
+
+    $('#size_y').focusout(function(){
+        var size = Number($(this).val());
+
+        if(10 < size){
+            var canvas = document.querySelector("#ctx");
+            var ctx = canvas.getContext('2d');
+
+            ctx.canvas.height = size;
+        }
+    });
+
+
+    var local_data = window.localStorage.getItem('ero_data');
+    if(local_data){
+        dataList = local_data;
+        actChange('onload');
+    }
+
+});
+
+var add_text = function(){
+    $('#box').append(data.text);
+    dataList.push({
+        type : 'text',
+        text : null,
+        x    : 0,
+        y    : 0
+    });
+
+    $('#box .item:last').attr('data-key',Math.random());
+};
+
+var add_img = function(){
+    $('#box').append(data.img);
+    dataList.push({
+        type   : 'img',
+        imgURL : null,
+        x      : 0,
+        y      : 0
+    });
+    $('#box .item:last').attr('data-key',Math.random());
+};
+
+
+$(document).on("click", "#box .del", function() {
+    var idx = $('#box .item').index($(this).parent());
+
+    dataList.splice(idx,1);
+    $(this).parent().remove();
+});
+
+
+/*
+$('document').on('focusout', '#box .item .text',function(){
+    var canvas = document.querySelector("#ctx");
+    var ctx = canvas.getContext('2d');
+
+
+    ctx.font = "48px mplus-1m-regular";
+
+    for(var i=0,len=dataList.length; i<len; i++){
+        var d = dataList[i];
+
+        if(d.type == 'text'){
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.lineJoin = "round";
+            ctx.strokeText(d.text, d.x, d.y);
+
+        
+            ctx.fillText(d.text, d.x, d.y);
+        }
+
+    }
+});
+*/
+$(document).on('change', '#box .item input', function(){
+    var idx = $('#box .item').index($(this).parents('.item'));
+
+    //変更があったイベントのチェンジ
+    actChange(idx);
+});
+
+var actChange = function(idx){
+
+    var d   = dataList[idx];
+    var dom = $('#box .item').eq(idx);
+
+    //全データを確認する
+    var obj = dataList[idx];
+    if($(dom).attr('class') === 'item text'){
+        obj.text = $(dom).find('input.text').val();
+        obj.x    = Number($(dom).find('input.x').val());
+        obj.y    = Number($(dom).find('input.y').val());
+        obj.size = Number($(dom).find('input.size').val());
+    }else{
+        obj.x    = Number($(dom).find('input.x').val());
+        obj.y    = Number($(dom).find('input.y').val());
+        obj.size = Number($(dom).find('input.size').val());
+
+        var imgDom   = $(dom).find('input.file').get(0);
+        var file_url = URL.createObjectURL(imgDom.files[0]);
+
+        var img = new Image();
+        img.onload=function(e){
+            refreshCanvas();
+        }
+        img.src = file_url;
+
+        obj.img  = img;
+        obj.name = imgDom.files[0].name;
+    }
+
+    //ローカルすとれーじに保存
+
+    refreshCanvas();
+
+    //window.localStorage.setItem('ero_data', dataList);
+};
+
+
+
+var refreshCanvas = function(){
+    var canvas = document.querySelector("#ctx");
+    var ctx = canvas.getContext('2d');
+    
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    for(var i=0,len=dataList.length; i<len; i++){
+        var d = dataList[i];
+
+        if(d.type == 'text'){
+            ctx.strokeStyle = "#000000";
+            ctx.fillStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.lineJoin = "round";
+
+            ctx.font = d.size+"px mplus-1m-regular";
+
+            var w = ctx.measureText(d.text);
+
+            ctx.strokeText(d.text, d.x, d.y+d.size);
+            ctx.fillText(d.text, d.x, d.y+d.size);
+        }else{
+
+            if(d.img && d.img.width){
+                ctx.drawImage(d.img, d.x, d.y, d.img.width*d.size/100, d.img.height*d.size/100);
+            }
+        }
+    }
+};
+
+</script>
+
+
+<style type="text/css">
+@font-face {
+	font-family: mplus-1m-regular;
+	src: url(C:/Users/oneon/OneDrive/デスクトップ/one_ci-en_pro/one_ci-en/fonts/mplus-1m-regular.woff);
+}
+body {
+	font-family: mplus-1m-regular;
+}
+
+#ctx {
+    border: 1px solid #555;
+    background-color: #5d9b9d;
+}
+.ctx_size{
+    margin-bottom: 5px;
+}
+.ctx_size .name{
+    display: inline-block;
+    width: 90px;
+}
+
+#make_common{
+    margin: 10px 0px;
+    padding: 10px 15px;
+}
+
+#box {
+    display        : flex;
+    justify-content: flex-start;
+    font-size      : 15px;
+    gap            : 10px 5px;
+    margin-top     : 30px;
+    margin-bottom  : 10px;
+    flex-wrap      : wrap;
+}
+#box .item{
+    border    : 1px solid #555;
+    flex      : 200px;
+    min-height: 120px;
+    max-width : 238px;
+    position  : relative;
+}
+#box .item table tr:first-child td{
+    height: 34px;
+}
+#box .item input, #box .item select{
+    padding: 2px 4px;
+    border : 1px solid;
+}
+
+#box .item .text{
+    width: 222px;
+}
+#box .item .file{
+    width  : 236px;
+    border : 0;
+    padding: 2px 0px;
+}
+#box .item .x, #box .item .y{
+    width: 50px;
+}
+#box .item .size, #box .item .trans{
+    width: 50px;
+}
+#box .item select{
+    width: 60px;
+}
+
+#box .item.selected{
+    border: 3px dashed #C00;
+}
+
+#box .item .type{
+    font-size  : 11px;
+    padding-left: 4px;
+    line-height : 24px;
+}
+#box .item.text .type{
+    background-color: #bfc;
+}
+#box .item.img .type{
+    background-color: #bdf;
+}
+#box .item .del{
+    position : absolute;
+    right    : 1px;
+    top      : 1px;
+    padding  : 0px 12px;
+    cursor   : pointer;
+}
+#box .item .select{
+    position : absolute;
+    right    : 70px;
+    top      : 1px;
+    padding  : 0px 12px;
+    cursor   : pointer;
+}
+
+
+</style>
+<body>
+
+<a target="_blank" href="https://www.dlsite.com/maniax/announce/=/product_id/RJ01040335.html">
+    <div style="position: absolute; right: 64px; border: 1px solid #AAA; height: 150px;padding-right: 10px;">
+        <img src="https://img.dlsite.jp/modpub/images2/ana/doujin/RJ01041000/RJ01040335_ana_img_main.webp" style="height: 150px;">
+        <div style="font-weight: bold; font-size: 24px;display: inline-block; vertical-align: top;">
+            <div>テレサと賢者の石</div>
+            <div style="font-weight:normal; font-size:13px;"><span style="background-color: #ffd2d2;">ロールプレイング</span></div>
+            <div style="font-weight:normal; font-size:15px; margin-top: 65px;margin-left: 28px;">2024年春発売予定</div>
+        </div>
+    </div>
+</a>
+
+<div style="font-size: 19px;">画面サイズ</div>
+<div class="ctx_size"><div class="name">width</div><input type="text" id="size_x"></div>
+<div class="ctx_size"><div class="name">height</div><input type="text" id="size_y"></div>
+
+<div><input id="make_common" type="button" value="コモンイベントを出力" onclick="common()"></div>
+
+<input type="button" id="add_text" value="テキスト追加" onclick="add_text()">
+<input type="button" id="add_text" value="画像追加" onclick="add_img()">
+
+
+
+
+
+<div id="box">
+<!--
+    <div class="item text">
+        <div class="type">テキスト</div>
+        <table>
+            <tr>
+                <td colspan="4"><input class="text" type="text" value=""></td>
+            </tr>
+        
+            <tr>
+                <td width="50px">x</td><td><input class="x" type="text" value="0"></td>
+                <td width="50px">y</td><td><input class="y" type="text" value="0"></td>
+            </tr>
+            <tr>
+                <td>原点</td>
+                <td>
+                    <select class="jouge">
+                        <option>上</option>
+                        <option>中</option>
+                        <option>下</option>
+                    </select>
+                </td>
+                <td></td>
+                <td>
+                    <select class="sayu">
+                        <option>左</option>
+                        <option>中</option>
+                        <option>右</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>サイズ</td><td><input class="size" type="text" value="16"></td><td></td><td></td>
+            </tr>
+        </table>
+        <input class="select" type="button" value="選択">
+        <input class="del" type="button" value="削除">
+    </div>
+
+    <div class="item img">
+        <div class="type">画像</div>
+
+        <table>
+            <tr>
+                <td colspan="4"><input class="file" type="file"></td>
+            </tr>
+            <tr>
+                <td>x</td><td><input class="x" type="text" value="0"></td>
+                <td>y</td><td><input class="y" type="text" value="0"></td>
+            </tr>
+            <tr>
+                <td>原点</td>
+                <td>
+                    <select class="jouge">
+                        <option>上</option>
+                        <option>中</option>
+                        <option>下</option>
+                    </select>
+                </td>
+                <td></td>
+                <td>
+                    <select class="sayu">
+                        <option>左</option>
+                        <option>中</option>
+                        <option>右</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>サイズ</td><td><input class="size" type="text" value="100"></td>
+                <td>透明度</td><td><input class="trans" type="text" value="100"></td>
+            </tr>
+        </table>
+        <input class="select" type="button" value="選択">
+        <input class="del" type="button" value="削除">
+    </div>
+-->
+</div>
+
+<div style="text-align: center;">
+    <canvas id="ctx" width="600px" height="400px"></canvas>
+</div>
+
+<div style="text-align: center;">
+<textarea id="view" style="width: 600px; height: 800px;"></textarea>
+</div>
+
+</body>
+
+</html>
